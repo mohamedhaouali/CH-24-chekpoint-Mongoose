@@ -1,0 +1,1666 @@
+***************terminal
+
+mkdir mongossefinal
+
+cd mongossefinal
+
+****npm init
+
+entry point: (index.js) server.js
+
+keywords: mern,backend,express,mongosse
+
+author: med haouali
+
+*********
+
+npm i express mongoose
+
+******* creer fichier server.js
+
+const express = require("express")
+
+const app = express()
+
+
+const port = 5000
+
+app.listen(port, (error) => {
+    error ? console.log('Error server !!!')
+        : console.log("server is running at localhost:5000");
+});
+
+
+******************server.js (sabrine)
+
+// import express
+
+const express = require("express");
+
+// express instance
+
+app = express();
+
+//3 - Port
+
+const port = 6000
+
+
+
+// Start Server
+
+app.listen(port, (err) => {
+    err ? console.error(err) : console.log(`Server is Running on Port ${port}`);
+});
+
+*********************
+
+npm i -D nodemon
+
+*******************
+
+node server.js
+
+**********************package.json
+
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "backend":"nodemon server"
+  },
+  
+  
+*************** 
+
+npm run backend  
+
+*****************server.js
+
+const port = process.env.PORT || 6000;
+
+*****************server.js
+
+
+
+
+***************installer dotenv
+
+npm uninstall dotenv
+
+https://www.npmjs.com/package/react-dotenv
+
+npm install -D dotenv
+
+*************creer fichier .env
+
+
+
+***********************server.js
+
+
+****************************.env
+
+PORT=6000
+
+
+***********************server.js
+
+
+//1- import express
+const express = require("express");
+//2- express instance
+const app = express();
+
+//4 Environment variables
+require("dotenv").config();
+
+//3 - Port
+
+const port = process.env.PORT
+
+
+// Start Server
+
+app.listen(port, error => {
+    error ? console.log('Can not run server !!!')
+        : console.log(`Server is Running on port ${port} ...`);
+});
+
+*************************creer dossier config->creer fichier connectDB.js (sabrine)
+
+*******google connect database mongoose
+
+https://mongoosejs.com/docs/connections.html
+
+************************config->creer fichier connectDB.js (sabrine)
+
+// require mongoose
+const mongoose = require("mongoose");
+//connect to DB
+const connectDB = () => {
+    mongoose.connect('mongodb://localhost:27017/mernDBmaii')
+}
+
+module.exports = connectDB;
+
+****************server.js
+
+//6 connect to DB
+
+const connectDB = require('./config/connectDB')
+connectDB()
+
+*************server.js
+
+
+//1- import express
+const express = require("express");
+
+//2- express instance
+const app = express();
+
+//5- require and configure dotenv
+
+require("dotenv").config();
+
+//6 connect to DB
+
+const connectDB = require('./config/connectDB')
+connectDB()
+
+//3 - Port
+
+const port = process.env.PORT
+
+
+// Start Server
+
+app.listen(port, error => {
+    error ? console.log('Can not run server !!!')
+        : console.log(`Server is Running on port ${port} ...`);
+});
+
+*****************config->config/connectDB
+
+// require mongoose
+const mongoose = require("mongoose");
+//connect to DB
+const connectDB = () => {
+    mongoose.connect('mongodb://localhost:27017/mernDBmaii',
+
+        {
+
+             useNewUrlParser: true,
+            useUnifiedTopology: true,
+        }
+
+    )
+}
+
+module.exports = connectDB;
+
+
+*********************.env (sabrine)
+
+PORT=6000
+
+MONGO_URI = mongodb://localhost:27017/mernDBmaii
+
+
+
+*******************config->connectDB (sabrine)
+
+// require mongoose
+const mongoose = require("mongoose");
+//connect to DB
+const connectDB = async () => {
+
+    try {
+
+        await mongoose.connect(process.env.MONGO_URI,
+
+            {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            }
+
+        )
+
+    } catch (error) {
+
+        console.error(`Cannot connect to DataBase... ${error}`);
+
+    }
+
+
+    console.log("Database connected ....");
+}
+
+module.exports = connectDB;
+
+
+*************************creer folder ->models->new file->Contact.js (sabrine)
+
+https://mongoosejs.com/docs/guide.html
+
+
+//require mongoose
+const mongoose = require("mongoose");
+//require Schema
+const schema = mongoose.Schema;
+
+//create contactSchema
+
+const contactSchema = new schema({
+    name: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    phone: Number,
+});
+
+module.exports = Contact = mongoose.model("contact", contactSchema);
+
+
+
+*********************creer folder ->routes->new file->contact.js
+
+// require express
+const { response } = require("express");
+const express = require("express");
+
+// require Router
+const router = express.Router();
+
+
+// test
+
+router.get('/test', (req, res) => {
+    res.send('hello world !!')
+})
+
+
+module.exports = router;
+
+
+******************server.js
+
+//7 Require router
+
+const router = require('./routes/contact')
+
+app.use(router)
+
+
+************************ server.js 39.29
+
+//7 Require router
+
+const router = require('./routes/contact')
+
+app.use('/api/contacts/', router)
+
+
+***********************Postman new Workspace-> new collection 41.23
+
+workspace->create ->Name MERN-APP-MAI->
+
+create new collection->name (contacts)
+
+contacts->add request
+
+**********postman Get 
+
+http://localhost:6000/api/contacts/test
+
+=>hello world !!
+
+**********************routes->contact.js  (route add)
+
+// require express
+const { response } = require("express");
+const express = require("express");
+
+// require Router
+const router = express.Router();
+
+// require model
+
+const Contact = require('../model/Contact')
+
+
+/* test
+
+//router.get('/test', (req, res) => {
+    res.send('hello world !!')
+})
+
+// @desc: add a new contact
+// @method: POST
+// @patch: 'http://localhost:6000/api/contacts/'
+// @data : req.body
+
+router.post('/', async (req, res) => {
+
+    try {
+
+        // new Contact
+        const newContact = req.body
+
+        // validateur name and email 
+
+        if (!newContact.name || !newContact.email) {
+            return res.status(400).send({ msg: "name and email are required !!!" })
+
+        }
+
+        //validateur email unique
+
+        const contactToFind = await Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }
+
+
+        const contactToAdd = new Contact(newContact)
+        //save BD
+        await contactToAdd.save()
+
+        res.status(200).send({ msg: "Contact added success ...", contactToAdd })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not add new Contact ...", error })
+    }
+
+})
+
+
+
+// @desc: get all contact
+// @method: GET
+// @patch: 'http://localhost:6000/api/contacts/'
+// @data : no
+
+router.get('/', async (req, res) => {
+
+    try {
+        const listContacts = await Contact.find()
+        res.status(200).send({ msg: "this is the list of contacts ...", listContacts })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not get all Contacts ...", error })
+
+    }
+
+
+})
+
+
+****************Postman POST
+
+add request->
+
+/addcontact 
+
+
+body raw json
+
+****http://localhost:6000/api/contacts/
+
+{
+"name": "ines",
+"email": "ines@gmail.com",
+"phone": 123456
+    
+}
+
+=> erreur
+
+*************************server.js
+
+//8 - bodyparser middleware
+
+app.use(express.json());
+
+*****************Postman Get 
+
+http://localhost:6000/api/contacts/
+
+
+***********************54.53 POST  http://localhost:6000/api/contacts/  (Postman)
+
+{
+
+"email": "ines@gmail.com",
+"phone": 123456
+    
+}
+
+=>metzadech fi base du donnees
+
+{
+    "msg": "Contact added success ...",
+    "contactToAdd": {
+        "email": "ines@gmail.com",
+        "phone": 123456,
+        "_id": "61cebed6fe16708a9e450b27"
+    }
+}
+
+************************routes->contact (zidna try w catch)+await(loading)
+
+
+router.post('/', async (req, res) => {
+
+    try {
+
+        // new Contact
+        const newContact = req.body
+        const contactToAdd = new Contact(newContact)
+        //save BD
+        await contactToAdd.save()
+
+        res.status(200).send({ msg: "Contact added success ...", contactToAdd })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not add new Contact ...", error })
+    }
+
+
+}
+
+*********************Postman  POST   http://localhost:6000/api/contacts/
+
+
+{
+
+
+"email": "ines@gmail.com",
+"phone": 123456
+    
+}
+
+=>
+
+{
+    "msg": "Can not add new Contact ...",
+    "error": {
+        "errors": {
+            "name": {
+                "name": "ValidatorError",
+                "message": "Path `name` is required.",
+                "properties": {
+                    "message": "Path `name` is required.",
+                    "type": "required",
+                    "path": "name"
+                },
+                "kind": "required",
+                "path": "name"
+            }
+        },
+        "_message": "contact validation failed",
+        "name": "ValidationError",
+        "message": "contact validation failed: name: Path `name` is required."
+    }
+}
+
+*******************************Postman  POST   http://localhost:6000/api/contacts/
+
+{
+
+"name":"khouloud",
+"email": "ines@gmail.com",
+"phone": 123456
+    
+}
+
+
+=>
+
+{
+    "msg": "Can not add new Contact ...",
+    "error": {
+        "index": 0,
+        "code": 11000,
+        "keyPattern": {
+            "email": 1
+        },
+        "keyValue": {
+            "email": "ines@gmail.com"
+        }
+    }
+}
+
+
+**********************************routes->contact  (//validateur email)
+
+    //validateur email
+
+        const contactToFind = Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }
+		
+		
+********************************** routes->contact  (//validateur email and name)
+
+try {
+
+        // new Contact
+        const newContact = req.body
+        // validateur name and email 
+        if (!newContact.name || !newContact.email) {
+            return res.status(400).send({ msg: "name and email are required !!!" })
+
+        }
+
+        //validateur email unique
+
+        const contactToFind = Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }		
+		
+		
+********************Postman : POST http://localhost:6000/api/contacts/		
+
+
+{
+
+"name":"khouloud",
+"email": "ines@gmail.com",
+"phone": 123456
+    
+}
+
+=>
+
+{
+    "msg": "Contact already exist !!!"
+}
+
+************************Postman : POST http://localhost:6000/api/contacts/
+
+
+{
+
+"name":"khouloud",
+
+"phone": 123456
+    
+}
+
+=>
+
+{
+    "msg": "name and email are required !!!"
+}
+
+*********************routes->Contact
+
+
+router.post('/', async (req, res) => {
+
+    try {
+
+        // new Contact
+        const newContact = req.body
+        // validateur name and email 
+        if (!newContact.name || !newContact.email) {
+            return res.status(400).send({ msg: "name and email are required !!!" })
+
+        }
+
+        //validateur email unique
+
+        const contactToFind = await Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }
+
+
+        const contactToAdd = new Contact(newContact)
+        //save BD
+        await contactToAdd.save()
+
+        res.status(200).send({ msg: "Contact added success ...", contactToAdd })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not add new Contact ...", error })
+    }
+
+
+}
+
+);
+
+******************Postman POST http://localhost:6000/api/contacts/
+
+{
+
+"name":"khouloud",
+"email": "khouloud@gmail.com",
+"phone": 123456
+    
+}
+
+
+=>
+
+{
+    "msg": "Contact added success ...",
+    "contactToAdd": {
+        "name": "khouloud",
+        "email": "khouloud@gmail.com",
+        "phone": 123456,
+        "_id": "61cedb09e640f80bac061bd9",
+        "__v": 0
+    }
+}
+
+***********************routes->contact
+
+
+// @desc: get all contact
+    // @method: GET
+    // @patch: 'http://localhost:6000/api/contacts/'
+    // @data : no
+
+    router.get('/', async (req, res) => {
+
+        try {
+            const listContacts = await Contact.find()
+            res.status(200).send({ msg: "this is the list of contacts ...", })
+
+        } catch (error) {
+
+            res.status(400).send({ msg: "Can not get all Contacts ...", listContacts })
+
+        }
+
+
+    })
+	
+	
+****************Postman (get all contacts)  GET
+
+http://localhost:6000/api/contacts/
+
+
+=> erreur
+
+***********************1.26 routes->contact  DELETE
+
+// @desc: delete one  contact
+// @method: DELETE
+// @patch: 'http://localhost:6000/api/contacts/:id'
+// @data : req.params
+
+router.delete('/:id', async (req, res) => {
+
+    try {
+
+        const contactId = req.params.id
+
+        await Contact.deleteOne({ _id: contactId })
+
+        res.status(200).send({ msg: "Contact deleted succ ..." })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not delete contact with this id !!! ...", error })
+    }
+
+
+})
+
+*****************routes->Contact 
+
+// require express
+
+const { response } = require("express");
+const express = require("express");
+
+// require Router
+const router = express.Router();
+
+// require model
+
+const Contact = require('../model/Contact')
+
+
+/* test
+
+//router.get('/test', (req, res) => {
+    res.send('hello world !!')
+})
+
+*/
+
+// @desc: add a new contact
+// @method: POST
+// @patch: 'http://localhost:6000/api/contacts/'
+// @data : req.body
+
+router.post('/', async (req, res) => {
+
+    try {
+
+        // new Contact
+        const newContact = req.body
+
+        // validateur name and email 
+
+        if (!newContact.name || !newContact.email) {
+            return res.status(400).send({ msg: "name and email are required !!!" })
+
+        }
+
+        //validateur email unique
+
+        const contactToFind = await Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }
+
+
+        const contactToAdd = new Contact(newContact)
+        //save BD
+        await contactToAdd.save()
+
+        res.status(200).send({ msg: "Contact added success ...", contactToAdd })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not add new Contact ...", error })
+    }
+
+
+    // @desc: get all contact
+    // @method: GET
+    // @patch: 'http://localhost:6000/api/contacts/'
+    // @data : no
+
+    router.get('/', async (req, res) => {
+
+        try {
+            const listContacts = await Contact.find()
+            res.status(200).send({ msg: "this is the list of contacts ...", })
+
+        } catch (error) {
+
+            res.status(400).send({ msg: "Can not get all Contacts ...", listContacts })
+
+        }
+
+
+    })
+
+})
+
+// @desc: delete one  contact
+// @method: DELETE
+// @patch: 'http://localhost:6000/api/contacts/:id'
+// @data : req.params
+
+router.delete('/:id', async (req, res) => {
+
+    try {
+
+        const contactId = req.params.id
+
+        await Contact.deleteOne({ _id: contactId })
+
+        res.status(200).send({ msg: "Contact deleted succ ..." })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not delete contact with this id !!! ...", error })
+    }
+
+
+})
+
+
+
+
+
+
+module.exports = router;
+	
+*****************************Postman 	delete contact 1h.29
+ 
+DELETE  http://localhost:6000/api/contacts/61cedb09e640f80bac061bd9
+
+=>
+
+{
+    "msg": "Contact deleted succ ..."
+}
+
+***********************routes->contact get one  contact by id
+
+
+
+// @desc: get one  contact by id
+// @method: GET
+// @patch: 'http://localhost:6000/api/contacts/:_id'
+// @data : req.params
+
+router.get('/:_id', async (req, res) => {
+
+    try {
+
+        const { _id } = req.params
+        const contactToFind = await Contact.findOne({ _id })
+        res.status(200).send({ msg: "i find the contact ...", contactToFind })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not get contact with this id !!! ...", error })
+    }
+
+
+}
+	
+***************Postman  contact get one  contact by id  (GET)
+
+	http://localhost:6000/api/contacts/61ccc42097a4064641d3f946
+
+=>	
+
+{
+    "msg": "i find the contact ...",
+    "contactToFind": {
+        "_id": "61ccc42097a4064641d3f946",
+        "name": "ines",
+        "email": "ines@gmail.com",
+        "phone": 123456,
+        "__v": 0
+    }
+}
+
+************************1h.37 UPDATE
+
+
+// @desc: update one contact
+// @method: PUT
+// @patch: 'http://localhost:6000/api/contacts/:_id'
+// @data : req.params and req.body
+
+
+router.put('/:_id', async (req, res) => {
+
+    try {
+
+        const { _id } = req.params
+        const newContact = req.body
+
+        await Contact.updateOne({ _id }, { $set: { ...newContact } })
+
+        res.status(200).send({ msg: "Contact updated success ..." })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not update contact with this id !!! ...", error })
+    }
+
+
+})
+
+************************routes->contact
+
+// require express
+
+const { response } = require("express");
+const express = require("express");
+
+// require Router
+const router = express.Router();
+
+// require model
+
+const Contact = require('../model/Contact')
+
+
+/* test
+
+//router.get('/test', (req, res) => {
+    res.send('hello world !!')
+})
+
+*/
+
+// @desc: add a new contact
+// @method: POST
+// @patch: 'http://localhost:6000/api/contacts/'
+// @data : req.body
+
+router.post('/', async (req, res) => {
+
+    try {
+
+        // new Contact
+        const newContact = req.body
+
+        // validateur name and email 
+
+        if (!newContact.name || !newContact.email) {
+            return res.status(400).send({ msg: "name and email are required !!!" })
+
+        }
+
+        //validateur email unique
+
+        const contactToFind = await Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }
+
+
+        const contactToAdd = new Contact(newContact)
+        //save BD
+        await contactToAdd.save()
+
+        res.status(200).send({ msg: "Contact added success ...", contactToAdd })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not add new Contact ...", error })
+    }
+
+
+    // @desc: get all contact
+    // @method: GET
+    // @patch: 'http://localhost:6000/api/contacts/'
+    // @data : no
+
+    router.get('/', async (req, res) => {
+
+        try {
+            const listContacts = await Contact.find()
+            res.status(200).send({ msg: "this is the list of contacts ...", })
+
+        } catch (error) {
+
+            res.status(400).send({ msg: "Can not get all Contacts ...", listContacts })
+
+        }
+
+
+    })
+
+})
+
+// @desc: delete one  contact
+// @method: DELETE
+// @patch: 'http://localhost:6000/api/contacts/:id'
+// @data : req.params
+
+router.delete('/:id', async (req, res) => {
+
+    try {
+
+        const contactId = req.params.id
+
+        await Contact.deleteOne({ _id: contactId })
+
+        res.status(200).send({ msg: "Contact deleted succ ..." })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not delete contact with this id !!! ...", error })
+    }
+
+
+})
+
+
+// @desc: get one  contact by id
+// @method: GET
+// @patch: 'http://localhost:6000/api/contacts/:_id'
+// @data : req.params
+
+router.get('/:_id', async (req, res) => {
+
+    try {
+
+        const { _id } = req.params
+        const contactToFind = await Contact.findOne({ _id })
+        res.status(200).send({ msg: "i find the contact ...", contactToFind })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not get contact with this id !!! ...", error })
+    }
+
+
+})
+
+
+// @desc: update one contact
+// @method: PUT
+// @patch: 'http://localhost:6000/api/contacts/:_id'
+// @data : req.params and req.body
+
+
+router.put('/:_id', async (req, res) => {
+
+    try {
+
+        const { _id } = req.params
+        const newContact = req.body
+
+        await Contact.updateOne({ _id }, { $set: { ...newContact } })
+
+        res.status(200).send({ msg: "Contact updated success ..." })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not update contact with this id !!! ...", error })
+    }
+
+
+})
+
+
+module.exports = router;
+
+
+*******************Postman Put   update contact
+
+http://localhost:6000/api/contacts/61cefb1131b5aef69d374969
+
+Body,raw ,json
+
+{
+
+"name":"aliaaa",
+"email": "aaa@gmail.com",
+"phone": 123456
+    
+}
+
+===>
+{
+    "msg": "Contact updated success ..."
+}
+
+************************routes->Contact
+
+// @desc: update one contact
+// @method: PUT
+// @patch: 'http://localhost:6000/api/contacts/:_id'
+// @data : req.params and req.body
+
+
+router.put('/:_id', async (req, res) => {
+
+    try {
+
+        const { _id } = req.params
+        const newContact = req.body
+
+        let result = await Contact.updateOne({ _id }, { $set: { ...newContact } })
+
+
+
+        if (result.nModified === 0) {
+
+            return res.status(400).send({ msg: "Contact already updated" })
+        }
+
+        res.status(200).send({ msg: "Contact updated success ..." })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not update contact with this id !!! ...", error })
+    }
+
+
+})
+
+
+******************************1h:50  
+
+// require express
+
+const express = require("express");
+
+// require Router
+const router = express.Router();
+
+// require model
+
+const Contact = require('../model/Contact')
+
+
+/* test
+
+//router.get('/test', (req, res) => {
+    res.send('hello world !!')
+})
+
+*/
+
+// @desc: add a new contact
+// @method: POST
+// @patch: 'http://localhost:6000/api/contacts/'
+// @data : req.body
+
+router.post('/', async (req, res) => {
+
+    try {
+
+        // new Contact
+        const newContact = req.body
+
+        // validateur name and email 
+
+        if (!newContact.name || !newContact.email) {
+            return res.status(400).send({ msg: "name and email are required !!!" })
+
+        }
+
+        //validateur email unique
+
+        const contactToFind = await Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }
+
+
+        const contactToAdd = new Contact(newContact)
+        //save BD
+        await contactToAdd.save()
+
+        res.status(200).send({ msg: "Contact added success ...", contactToAdd })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not add new Contact ...", error })
+    }
+
+})
+
+// @desc: get all contact
+// @method: GET
+// @patch: 'http://localhost:6000/api/contacts/'
+// @data : no
+
+router.get('/', async (req, res) => {
+
+    try {
+        const listContacts = await Contact.find()
+        res.status(200).send({ msg: "this is the list of contacts ...", listContacts })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not get all Contacts ...", error })
+
+    }
+
+
+})
+
+
+
+// @desc: delete one  contact
+// @method: DELETE
+// @patch: 'http://localhost:6000/api/contacts/:id'
+// @data : req.params
+
+router.delete('/:id', async (req, res) => {
+
+    try {
+
+        const contactId = req.params.id
+
+        await Contact.deleteOne({ _id: contactId })
+
+        res.status(200).send({ msg: "Contact deleted succ ..." })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not delete contact with this id !!! ...", error })
+    }
+
+
+})
+
+
+// @desc: get one  contact by id
+// @method: GET
+// @patch: 'http://localhost:6000/api/contacts/:_id'
+// @data : req.params
+
+router.get('/:_id', async (req, res) => {
+
+    try {
+
+        const { _id } = req.params
+        const contactToFind = await Contact.findOne({ _id })
+        res.status(200).send({ msg: "i find the contact ...", contactToFind })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not get contact with this id !!! ...", error })
+    }
+
+
+})
+
+
+// @desc: update one contact
+// @method: PUT
+// @patch: 'http://localhost:6000/api/contacts/:_id'
+// @data : req.params and req.body
+
+
+router.put('/:_id', async (req, res) => {
+
+    try {
+
+        const { _id } = req.params
+        const newContact = req.body
+
+        let result = await Contact.updateOne({ _id }, { $set: { ...newContact } })
+
+
+
+        if (result.nModified === 0) {
+
+            return res.status(400).send({ msg: "Contact already updated" })
+        }
+
+        res.status(200).send({ msg: "Contact updated success ..." })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not update contact with this id !!! ...", error })
+    }
+
+
+})
+
+
+module.exports = router;
+
+
+******************************creer folder controllers->new fichier->contact.controllers.js
+ 
+=> couper
+
+ async (req, res) => {
+
+    try {
+
+        // new Contact
+        const newContact = req.body
+
+        // validateur name and email 
+
+        if (!newContact.name || !newContact.email) {
+            return res.status(400).send({ msg: "name and email are required !!!" })
+
+        }
+
+        //validateur email unique
+
+        const contactToFind = await Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }
+
+
+        const contactToAdd = new Contact(newContact)
+        //save BD
+        await contactToAdd.save()
+
+        res.status(200).send({ msg: "Contact added success ...", contactToAdd })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not add new Contact ...", error })
+    }
+
+}
+
+
+=> coller dans controllers
+
+
+const addContact = async (req, res) => {
+
+    try {
+
+        // new Contact
+        const newContact = req.body
+
+        // validateur name and email 
+
+        if (!newContact.name || !newContact.email) {
+            return res.status(400).send({ msg: "name and email are required !!!" })
+
+        }
+
+        //validateur email unique
+
+        const contactToFind = await Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }
+
+
+        const contactToAdd = new Contact(newContact)
+        //save BD
+        await contactToAdd.save()
+
+        res.status(200).send({ msg: "Contact added success ...", contactToAdd })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not add new Contact ...", error })
+    }
+
+}
+
+********************users.controllers
+
+
+
+const addContact = async (req, res) => {
+
+    try {
+
+        // new Contact
+        const newContact = req.body
+
+        // validateur name and email 
+
+        if (!newContact.name || !newContact.email) {
+            return res.status(400).send({ msg: "name and email are required !!!" })
+
+        }
+
+        //validateur email unique
+
+        const contactToFind = await Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }
+
+
+        const contactToAdd = new Contact(newContact)
+        //save BD
+        await contactToAdd.save()
+
+        res.status(200).send({ msg: "Contact added success ...", contactToAdd })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not add new Contact ...", error })
+    }
+
+}
+
+
+module.exports = controllers = { addContact }
+
+
+*********************routes->contact.js
+
+//require controllers
+
+const controllers = require('../controllers/contact.controller'
+
+//require controllers
+
+router.post('/', controllers.addContact)
+
+)
+
+****************************conntactcontrollers
+
+
+// add Contact
+
+const addContact = async (req, res) => {
+
+    try {
+
+        // new Contact
+        const newContact = req.body
+
+        // validateur name and email 
+
+        if (!newContact.name || !newContact.email) {
+            return res.status(400).send({ msg: "name and email are required !!!" })
+
+        }
+
+        //validateur email unique
+
+        const contactToFind = await Contact.findOne({ email: newContact.email })
+
+        if (contactToFind) {
+
+            return res.status(400).send({ msg: "Contact already exist !!!" })
+        }
+
+
+        const contactToAdd = new Contact(newContact)
+        //save BD
+        await contactToAdd.save()
+
+        res.status(200).send({ msg: "Contact added success ...", contactToAdd })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not add new Contact ...", error })
+    }
+
+}
+
+// get all contacts
+
+const getContacts = async (req, res) => {
+
+    try {
+        const listContacts = await Contact.find()
+        res.status(200).send({ msg: "this is the list of contacts ...", listContacts })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not get all Contacts ...", error })
+
+    }
+
+
+}
+
+//delete contact
+
+
+const deleteContact = async (req, res) => {
+
+    try {
+
+        const contactId = req.params.id
+
+        await Contact.deleteOne({ _id: contactId })
+
+        res.status(200).send({ msg: "Contact deleted succ ..." })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not delete contact with this id !!! ...", error })
+    }
+
+
+}
+
+// get one Contact
+
+const getContact = async (req, res) => {
+
+    try {
+
+        const { _id } = req.params
+        const contactToFind = await Contact.findOne({ _id })
+        res.status(200).send({ msg: "i find the contact ...", contactToFind })
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not get contact with this id !!! ...", error })
+    }
+
+
+}
+
+// update Contact
+
+const updateContact = async (req, res) => {
+
+    try {
+
+        const { _id } = req.params
+        const newContact = req.body
+
+        let result = await Contact.updateOne({ _id }, { $set: { ...newContact } })
+
+
+
+        if (result.nModified === 0) {
+
+            return res.status(400).send({ msg: "Contact already updated" })
+        }
+
+        res.status(200).send({ msg: "Contact updated success ..." })
+
+
+    } catch (error) {
+
+        res.status(400).send({ msg: "Can not update contact with this id !!! ...", error })
+    }
+
+
+}
+
+
+module.exports = controllers = { addContact, getContacts, deleteContact, getContact, updateContact }
+
+
+********************contact
+
+// require express
+
+const express = require("express");
+
+// require Router
+const router = express.Router();
+
+// require model
+
+const Contact = require('../model/Contact')
+
+//require controllers
+
+const controllers = require('../controllers/contact.controller')
+
+/* test
+
+//router.get('/test', (req, res) => {
+    res.send('hello world !!')
+})
+
+*/
+
+// @desc: add a new contact
+// @method: POST
+// @patch: 'http://localhost:6000/api/contacts/'
+// @data : req.body
+
+router.post('/', controllers.addContact)
+
+// @desc: get all contact
+// @method: GET
+// @patch: 'http://localhost:6000/api/contacts/'
+// @data : no
+
+router.get('/', controllers.getContacts)
+
+
+
+// @desc: delete one  contact
+// @method: DELETE
+// @patch: 'http://localhost:6000/api/contacts/:id'
+// @data : req.params
+
+router.delete('/:id', controllers.deleteContact)
+
+
+// @desc: get one  contact by id
+// @method: GET
+// @patch: 'http://localhost:6000/api/contacts/:_id'
+// @data : req.params
+
+router.get('/:_id', controllers.getContact)
+
+
+// @desc: update one contact
+// @method: PUT
+// @patch: 'http://localhost:6000/api/contacts/:_id'
+// @data : req.params and req.body
+
+
+router.put('/:_id', controllers.updateContact)
+
+
+module.exports = router;
+
+*******************
+
+
